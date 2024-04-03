@@ -1,0 +1,47 @@
+package kr.or.navi.quick.trip;
+
+import java.util.HashMap;
+
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.navi.util.HttpUtil;
+
+@Controller
+@RequestMapping(value="/quick/trip")
+public class TripRecomController {
+
+	@GetMapping
+	@ResponseBody
+		public Object getRecom(@RequestParam String age,@RequestParam String per,@RequestParam String ssn) {
+	        String url = "http://127.0.0.1:5000";
+	        
+			HashMap<String, Object> build = new HttpUtil()
+					.url(url)
+					.header("accept", "application/json;charset=UTF-8")
+					.method("GET")
+					.queryString("age", age)
+					.queryString("per", per)
+					.queryString("ssn", ssn)
+					.build();
+				Object object = build.get("body");
+			return object;
+		}
+}
+
+
+//fetch("/navi/quick/trip?age=3&per=4&ssn=1",{
+//    method:"get",
+//    header:{
+//        accept:'application/json;charset=utf-8'
+//    }
+//}).then(resp=>{
+//    return resp.json()
+//}).then(jsonObj=>{
+//    console.log(jsonObj)
+//})

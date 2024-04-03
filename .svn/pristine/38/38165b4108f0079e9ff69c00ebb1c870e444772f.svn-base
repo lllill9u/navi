@@ -1,0 +1,35 @@
+package kr.or.navi.project.service;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.navi.common.paging.PaginationInfo;
+import kr.or.navi.project.dao.IssueDAO;
+import kr.or.navi.project.dao.ProjectDAO;
+import kr.or.navi.vo.IssueVO;
+import kr.or.navi.vo.ProjectVO;
+
+@Service
+public class ProjectServiceImple implements ProjectService {
+	@Inject
+	private ProjectDAO projectDao;
+	@Inject
+	private IssueDAO issueDao;
+	@Override
+	public List<ProjectVO> projectList(PaginationInfo paging) {
+		int totalRecord = projectDao.selectTotalRecord(paging);
+		paging.setTotalRecord(totalRecord);
+		return projectDao.selectList(paging);
+	}
+	@Override
+	public List<IssueVO> issueList(String proId,PaginationInfo paging) {
+		int totalRecord = issueDao.selectTotalRecord(proId,paging);
+		paging.setTotalRecord(totalRecord);
+		return issueDao.selectIssueList(proId, paging);
+	}
+	
+
+}

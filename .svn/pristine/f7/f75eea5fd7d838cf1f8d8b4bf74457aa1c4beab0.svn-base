@@ -1,0 +1,41 @@
+package kr.or.navi;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.or.navi.board.ano.service.AnoService;
+import kr.or.navi.project.service.ProjectService;
+import kr.or.navi.security.RealUser;
+import kr.or.navi.vo.BoardPostVO;
+import kr.or.navi.vo.EmpVO;
+import kr.or.navi.vo.ProjectVO;
+
+@Controller
+public class IndexController {
+	
+	@Inject
+	AnoService anoSerivce;
+	
+	@Inject
+	ProjectService proService;
+	
+	@RequestMapping("/index.do")
+	public void index(Model model) {
+		//1. 공지사항 데이터 가져오기
+		List<BoardPostVO> anoMainlist = anoSerivce.retrieveAnoMainList();
+	
+		//2. 프로젝트 등록 데이터 가져오기
+		 int projectCnt = proService.projectMainCount();
+		//3. 우수회원 데이터 가져오기
+		
+		
+		model.addAttribute("anoMainlist", anoMainlist);
+		model.addAttribute("projectCnt", projectCnt);
+				
+	}
+}

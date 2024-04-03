@@ -1,0 +1,38 @@
+package kr.or.navi.vo;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(of="proId")
+public class ProjectVO implements Serializable{
+	private int rnum;
+	private String proId;
+	private String proStId;
+	private String proName;
+	private String proDesc;
+	private LocalDateTime proRegDt;
+	private LocalDateTime proDdlineEx;
+	private LocalDateTime proDdlineDt;
+	private String proDdlineYn;
+	private String empId;
+	private String empName;
+	private String cmName;
+	private List<TeamVO> teamList;
+	
+	public boolean isPLMember(EmpVO emp) {
+		return emp.getEmpId().equals(this.empId);
+	}
+	
+	public String getProRegDtStr() {
+		return proRegDt.format(DateTimeFormatter.ISO_DATE);
+	}
+	public String getProDdlineExStr() {
+		return proDdlineEx.format(DateTimeFormatter.ISO_DATE);
+	}
+}

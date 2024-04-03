@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.navi.project.dao.IssueDAO">
+	<resultMap type="IssueVO" id="issueMap" autoMapping="true">
+		<id column="ISSUE_ID" property="issueId"/>
+		<result column="ISSUE_CN" property="issueCn" jdbcType="CLOB"/>
+	</resultMap>
+	
+	<sql id="searchFrag">
+		<trim suffixOverrides="AND">
+			<if test="not paging.detailCondition.empty">
+				AND
+				<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(paging.detailCondition.imprtId)">
+					 issue.imprt_id = #{paging.detailCondition.imprtId} AND 
+				</if>
+				<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(paging.detailCondition.issueId)">
+					issue.clsfc_id = #{paging.detailCondition.issueId} AND 
+				</if>
+				<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(paging.detailCondition.issueTitle)">
+				    INSTR(issue.issue_title, #{paging.detailCondition.issueTitle}) > 0 
+				</if>
+			</if>
+		</trim>
+	</sql>
+	<select id="selectIssueList" parameterType="PaginationInfo" resultMap="issueMap">
+	SELECT B.*
+		FROM(
+    SELECT ROWNUM RNUM, A.*
+			FROM(
+		SELECT
+                    issue_id
+                  , pro_id
+                  , issue_reg_id
+                  , emp.emp_name
+                  , issue.imprt_id
+                  , imp.cm_name as IMP_NAME
+                  , clsfc_id
+                  , states.cm_name as STATE_NAME
+                  , issue_title
+                  , issue_reg_dt
+                FROM
+                    issue join common imp on issue.imprt_id=imp.cm_id
+                    join common states on issue.clsfc_id=states.cm_id 
+                    join EMP ON(issue.issue_reg_id=emp.emp_id)
+                    WHERE issue.pro_id = #{proId}
+                    <include refid="searchFrag" />
+                    )A
+               ) B
+     <where>
+			<if test="paging.startRow gt 0 and paging.endRow gt 0">
+				<![CDATA[
+					RNUM >= #{paging.startRow} AND RNUM <= #{paging.endRow}
+				]]>
+			</if>
+		</where>
+	</select>
+	
+	<select id="selectTotalRecord">
+		WITH ISSE AS (
+			SELECT
+                    issue_id
+                  , pro_id
+                  , issue_reg_id
+                  , emp.emp_name
+                  , issue.imprt_id
+                  , imp.cm_name as IMP_NAME
+                  , clsfc_id
+                  , states.cm_name as STATE_NAME
+                  , issue_title
+                  , issue_reg_dt
+                FROM
+                    issue join common imp on issue.imprt_id=imp.cm_id
+                    join common states on issue.clsfc_id=states.cm_id 
+                    join EMP ON(issue.issue_reg_id=emp.emp_id)
+                    WHERE issue.pro_id = #{proId1}
+                    <include refid="searchFrag" />
+			    )
+			    SELECT COUNT(*) FROM ISSE
+	</select>
+	
+	<select id="selectIssue" resultMap="issueMap">
+		SELECT
+           issue_id
+         , pro_id
+         , issue_reg_id
+         , emp.emp_name
+         , issue.imprt_id
+         , imp.cm_name as IMP_NAME
+         , clsfc_id
+         , states.cm_name as STATE_NAME
+         , issue_title
+         , issue_reg_dt
+         , issue.issue_cn
+         , dept.dept_name
+         , position.ps_name
+       FROM
+           issue join common imp on issue.imprt_id=imp.cm_id
+           join common states on issue.clsfc_id=states.cm_id 
+           join EMP ON(issue.issue_reg_id=emp.emp_id)
+           join DEPT ON(emp.dept_id=dept.dept_id)
+           join position on(emp.ps_id=position.ps_id)
+		WHERE
+			issue_id = #{issueId}
+	</select>
+</mapper>

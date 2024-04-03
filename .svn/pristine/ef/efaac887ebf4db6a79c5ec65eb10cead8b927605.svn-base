@@ -1,0 +1,59 @@
+package kr.or.navi.project.service;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.navi.common.paging.PaginationInfo;
+import kr.or.navi.project.dao.IssueDAO;
+import kr.or.navi.project.dao.ProjectDAO;
+import kr.or.navi.vo.EmpVO;
+import kr.or.navi.vo.IssueVO;
+import kr.or.navi.vo.ProjectVO;
+import kr.or.navi.vo.TeamVO;
+
+@Service
+public class ProjectServiceImple implements ProjectService {
+	@Inject
+	private ProjectDAO projectDao;
+	@Inject
+	private IssueDAO issueDao;
+	@Override
+	public List<ProjectVO> projectList(PaginationInfo paging) {
+		int totalRecord = projectDao.selectTotalRecord(paging);
+		paging.setTotalRecord(totalRecord);
+		return projectDao.selectList(paging);
+	}
+	@Override
+	public List<IssueVO> issueList(String proId,PaginationInfo paging) {
+		int totalRecord = issueDao.selectTotalRecord(proId,paging);
+		paging.setTotalRecord(totalRecord);
+		return issueDao.selectIssueList(proId, paging);
+	}
+	@Override
+	public ProjectVO projectOne(String proId) {
+		return projectDao.selectProject(proId);
+	}
+	@Override
+	public boolean authPL(EmpVO vo,ProjectVO project) {
+		boolean f = false;
+		String empId = vo.getEmpId();
+		List<TeamVO> teamList = project.getTeamList();
+		for(TeamVO team : teamList) {
+			String teamId = team.getEmpId();
+			List<String> empRoles = team.getEmpRoles();
+			for(String role : empRoles) {
+				if(role.equals("ROLE_PL")) {
+					if(teamId.equals(empId)) {
+						f=true;
+					}
+				}
+			}
+		}
+		return f;
+	}
+	
+
+}

@@ -1,0 +1,13 @@
+package kr.or.navi.vo;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(of="tpsId")
+public class TaskProcessStatusVO {
+	private String tpsId;
+	private String tpsName;
+	private String tpsIng;
+	private String tpsDesc;
+}

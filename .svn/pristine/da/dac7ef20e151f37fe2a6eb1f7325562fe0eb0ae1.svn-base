@@ -1,0 +1,7 @@
+package kr.or.navi.projectdetail.issue.controller.service;
+
+import kr.or.navi.vo.IssueVO;
+
+public interface IssueService {
+	public IssueVO selectIssueOne(String issueId);
+}

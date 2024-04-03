@@ -1,0 +1,84 @@
+package kr.or.navi.common.preparer;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+
+import org.apache.tiles.Attribute;
+import org.apache.tiles.AttributeContext;
+import org.apache.tiles.preparer.ViewPreparer;
+import org.apache.tiles.request.Request;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.web.servlet.HandlerMapping;
+
+import kr.or.navi.common.preparer.dao.ResourceDAO;
+import kr.or.navi.mapper.dao.EmpDAO;
+import kr.or.navi.security.EmpVOWrapper;
+import kr.or.navi.vo.EmpVO;
+import kr.or.navi.vo.MenuVO;
+import kr.or.navi.vo.ResrceVO;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Preparer("mypagePreparer")
+public class MypageMenuViewPreparer implements ViewPreparer{
+	@Inject
+	ResourceDAO dao;
+	
+	@Inject
+	private EmpDAO empDao;
+
+	@Override
+	public void execute(Request req, AttributeContext ctx) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		EmpVOWrapper principal = (EmpVOWrapper) authentication.getPrincipal();
+		EmpVO realUser = principal.getRealUser();
+		String menu = realUser.getEmpName() +" ("+ realUser.getDeptName() + ")";
+		List<MenuVO> main = dao.selectMainList();
+		List<MenuVO> list = dao.selectMyPageList("1");
+		List<MenuVO> list2 = dao.selectMyPageList("2");
+		List<MenuVO> list3 = dao.selectMyPageList("3");
+		Map<String, Object> context = req.getContext(Request.REQUEST_SCOPE);
+		
+		Map requestUrl = (Map) context.get(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+		log.info("requestUrl : {}", requestUrl.get("empId"));
+		EmpVO empVO = empDao.selectOne((String)requestUrl.get("empId"));
+		context.put("emp", empVO);
+		context.put("main", main);
+		context.put("sessionMenu", menu);
+		context.put("mypageMenuList", list);
+		context.put("mypage2MenuList", list2);
+		context.put("mypage3MenuList", list3);
+		
+		Map<String,String> urls=new HashMap<String, String>();
+		if(list3 != null) {
+			for(MenuVO vo : list3) {
+				// ex) /board를 포함하는 애들만 3차메뉴가 나오게 함. contains 사용
+				// url /board가 포함된 url만 찾아서 나오게 하면 새로운 맵에 넣는다.
+				String url = vo.getRescUrl();
+				String rescMenu = vo.getRescMenu();
+				String[] split = url.split("/");
+				urls.put(rescMenu,split[1]);
+			}
+		}
+		context.put("urls", urls);
+	}
+}
+
+
+
+
+
+
+
+
+

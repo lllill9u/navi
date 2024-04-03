@@ -1,0 +1,22 @@
+package kr.or.navi.advice.project;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ModelAttribute;
+
+import kr.or.navi.common.dao.CommonDAO;
+import kr.or.navi.vo.CommonVO;
+
+@ControllerAdvice(value = "kr.or.navi.project")
+public class ProjectControllerAdvice {
+	@Inject
+	private CommonDAO dao;
+	
+	@ModelAttribute("projectStateList")
+	public List<CommonVO> addProjectStateList(){
+		return dao.selectProjectStateList();
+	}
+}

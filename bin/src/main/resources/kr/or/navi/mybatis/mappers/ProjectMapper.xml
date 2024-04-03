@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.navi.project.dao.ProjectDAO">
+	<resultMap type="ProjectVO" id="projectMap" autoMapping="true">
+		<id property="proId" column="PRO_ID"/>
+		<collection property="teamList" ofType="TeamVO" autoMapping="true">
+			<id property="proId" column="PRO_ID"/>
+			<id property="empId" column="EMP_ID"/>
+		</collection>
+	</resultMap>
+	
+<!-- 	<sql id="searchFrag"> -->
+<!-- 		<where> -->
+<!-- 			<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(simpleCondition.searchWord)"> -->
+<!-- 				<choose> -->
+<!-- 					<when test="simpleCondition.searchType eq 'name'"> -->
+<!-- 						INSTR(MEM_NAME, #{simpleCondition.searchWord}) > 0 -->
+<!-- 					</when> -->
+<!-- 					<when test="simpleCondition.searchType eq 'address'"> -->
+<!-- 						INSTR(MEM_ADD1, #{simpleCondition.searchWord}) > 0 -->
+<!-- 					</when> -->
+<!-- 					<otherwise> -->
+<!-- 						INSTR(MEM_NAME, #{simpleCondition.searchWord}) > 0 -->
+<!-- 						OR -->
+<!-- 						INSTR(MEM_ADD1, #{simpleCondition.searchWord}) > 0 -->
+<!-- 					</otherwise> -->
+<!-- 				</choose> -->
+<!-- 			</if> -->
+<!-- 		</where> -->
+<!-- 	</sql> -->
+	
+	<sql id="searchFrag">
+		<trim suffixOverrides="AND">
+			<if test="not detailCondition.empty">
+				AND
+				<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(detailCondition.projectState)">
+					 pro_st_id = #{detailCondition.projectState} AND 
+				</if>
+				<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(detailCondition.ing)">
+					PRO_DDLINE_DT IS NOT NULL AND
+				</if>
+				<if test="@org.apache.commons.lang3.StringUtils@isBlank(detailCondition.ing)">
+				    PRO_DDLINE_DT IS NULL AND
+				</if>
+				<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(detailCondition.project)">
+					INSTR(project.PRO_ID, #{detailCondition.project}) > 0 
+					OR
+					INSTR(project.PRO_NAME, #{detailCondition.project}) > 0 
+					OR
+					INSTR(emp.EMP_NAME, #{detailCondition.project}) > 0 
+				</if>
+			</if>
+		</trim>
+	</sql>
+	
+	<select id="selectList" resultMap="projectMap" parameterType="PaginationInfo">
+	 SELECT B.*
+		FROM(
+    SELECT ROWNUM RNUM, A.*
+			FROM(
+		SELECT
+	      	project.pro_id,
+		    pro_st_id,
+		    pro_name,
+		    pro_desc,
+		    pro_reg_dt,
+		    pro_ddline_ex,
+		    pro_ddline_dt,
+		    pro_ddline_yn,
+		    pro_del_yn,
+            team.emp_id,
+            team.role_id,
+            team.team_yn,
+		    emp.emp_name,
+            common.cm_name
+		FROM
+		    project inner join team on (project.pro_id=team.pro_id) inner join emp on(team.emp_id=emp.emp_id) inner join common on (project.pro_st_id = common.cm_id) 
+		where team.role_id = 'ROLE_PL'
+		<include refid="searchFrag" />
+		) A
+        ) B
+        <where>
+			<if test="startRow gt 0 and endRow gt 0">
+				<![CDATA[
+					RNUM >= #{startRow} AND RNUM <= #{endRow}
+				]]>
+			</if>
+		</where>
+	</select>
+	
+	<select id="select" resultMap="projectMap">
+		SELECT
+	      	project.pro_id,
+		    pro_st_id,
+		    pro_name,
+		    pro_desc,
+		    pro_reg_dt,
+		    pro_ddline_ex,
+		    pro_ddline_dt,
+		    pro_ddline_yn,
+		    pro_del_yn,
+            team.pro_id,
+            team.emp_id,
+            team.role_id,
+            team.team_yn,
+		    emp.emp_name,
+            common.cm_name
+		FROM
+		    project inner join team on (project.pro_id=team.pro_id) inner join emp on(team.emp_id=emp.emp_id) inner join common on (project.pro_st_id = common.cm_id) 
+
+		where project.pro_id = #{proId} and team.role_id = 'ROLE_PL'
+	</select>
+	<select id="selectTotalRecord">
+		WITH PROJ AS (
+		SELECT
+	      	project.pro_id,
+		    pro_st_id,
+		    pro_name,
+		    pro_desc,
+		    pro_reg_dt,
+		    pro_ddline_ex,
+		    pro_ddline_dt,
+		    pro_ddline_yn,
+		    pro_del_yn,
+            team.emp_id,
+            team.role_id,
+            team.team_yn,
+		    emp.emp_name,
+            common.cm_name
+		FROM
+		    project inner join team on (project.pro_id=team.pro_id) inner join emp on(team.emp_id=emp.emp_id) inner join common on (project.pro_st_id = common.cm_id) 
+		where team.role_id = 'ROLE_PL'
+		<include refid="searchFrag" />
+		)
+        SELECT COUNT(*) FROM PROJ
+	</select>
+</mapper>

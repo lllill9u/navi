@@ -1,0 +1,35 @@
+package kr.or.navi.vo;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+@Data
+@EqualsAndHashCode(of="empId")
+public class EmpVO implements Serializable{
+	private String empId;
+	private String deptName;
+	private String psId;
+	private String roleId;
+	private String cnId;
+	private String empImg;
+	private String empName;
+	private Integer empAge;
+	private String empGen;
+	private String empPass;
+	private String empRrno;
+	private String empPhone;
+	private String empTel;
+	private String empZip;
+	private String empAddr;
+	private String empMail;
+	private LocalDateTime empCmpYmd;
+	private Integer empCareer;
+	private LocalDateTime empQuitDt;
+	private String empLimitYn;
+	
+	private List<String> empRoles; // Team 테이블의 Role ID 리스트
+	
+}

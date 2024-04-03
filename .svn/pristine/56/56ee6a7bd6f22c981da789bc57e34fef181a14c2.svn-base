@@ -1,0 +1,18 @@
+package kr.or.navi.project.dao;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import javax.inject.Inject;
+
+import org.junit.jupiter.api.Test;
+
+import kr.or.navi.AbstractRootContextTest;
+
+class TeamDAOTest extends AbstractRootContextTest{
+	@Inject
+	TeamDAO dao;
+	@Test
+	void test() {
+	}
+
+}

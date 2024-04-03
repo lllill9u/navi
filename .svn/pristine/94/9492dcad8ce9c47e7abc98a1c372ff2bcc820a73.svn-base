@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.navi.mypage.dao.MypageDAO">
+    <resultMap type="ProjectVO" id="projectMap" autoMapping="true">
+        <id property="proId" column="PRO_ID" />
+        <collection property="teamList" ofType="TeamVO" autoMapping="true">
+            <id property="proId" column="PRO_ID" />
+            <id property="empId" column="EMP_ID" />
+        </collection>
+    </resultMap>
+
+	<sql id="searchFrag">
+		<trim suffixOverrides="AND">
+			<if test="not paging.detailCondition.empty">
+				AND
+				<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(paging.detailCondition.projectState)">
+					pro_st_id = #{paging.detailCondition.projectState} AND 
+				</if>
+				<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(paging.detailCondition.ing)">
+					PRO_DEL_YN IS NOT NULL AND
+				</if>
+				<if test="@org.apache.commons.lang3.StringUtils@isBlank(paging.detailCondition.ing)">
+				    PRO_DEL_YN IS NULL AND
+				</if>
+				<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(paging.detailCondition.project)">
+					INSTR(PROJECT.PRO_ID, #{paging.detailCondition.project}) > 0 
+					OR
+					INSTR(PROJECT.PRO_NAME, #{paging.detailCondition.project}) > 0 
+					OR
+					INSTR(EMP.EMP_NAME, #{paging.detailCondition.project}) > 0 
+				</if>
+			</if>
+		</trim>
+	</sql>
+
+    <select id="myProjectList" resultMap="projectMap" parameterType="PaginationInfo">
+        SELECT B.*
+        FROM (
+        SELECT ROWNUM RNUM, A.*
+        FROM (
+        SELECT
+        PROJECT.PRO_ID,
+        PROJECT.PRO_ST_ID,
+        PROJECT.PRO_NAME,
+        PROJECT.PRO_DESC,
+        PROJECT.PRO_REG_DT,
+        PROJECT.PRO_DDLINE_EX,
+        PROJECT.PRO_DDLINE_DT,
+        PROJECT.PRO_DDLINE_YN,
+        PROJECT.PRO_DEL_YN,
+        TEAM.EMP_ID,
+        TEAM.ROLE_ID,
+        TEAM.TEAM_YN,
+        EMP.EMP_NAME,
+        COMMON.CM_NAME,
+        COMMON.CM_ID
+        FROM
+        PROJECT
+        INNER JOIN TEAM ON (PROJECT.PRO_ID = TEAM.PRO_ID) INNER JOIN EMP ON (TEAM.EMP_ID = EMP.EMP_ID) INNER JOIN COMMON ON (PROJECT.PRO_ST_ID = COMMON.CM_ID)
+        WHERE
+        TEAM.EMP_ID = #{empId}
+        <include refid="searchFrag" />
+        ORDER BY PROJECT.PRO_REG_DT DESC
+        ) A
+        ) B
+        <where>
+            <if test="paging.startRow gt 0 and paging.endRow gt 0">
+                <![CDATA[
+                RNUM >= #{paging.startRow} AND RNUM <= #{paging.endRow}
+                ]]>
+            </if>
+        </where>
+    </select>
+
+<select id="selectTotalRecord">
+	WITH PROJ AS (
+        SELECT
+        PROJECT.PRO_ID,
+        PROJECT.PRO_ST_ID,
+        PROJECT.PRO_NAME,
+        PROJECT.PRO_DESC,
+        PROJECT.PRO_REG_DT,
+        PROJECT.PRO_DDLINE_EX,
+        PROJECT.PRO_DDLINE_DT,
+        PROJECT.PRO_DDLINE_YN,
+        PROJECT.PRO_DEL_YN,
+        TEAM.EMP_ID,
+        TEAM.ROLE_ID,
+        TEAM.TEAM_YN,
+        EMP.EMP_NAME,
+        COMMON.CM_NAME,
+        COMMON.CM_ID
+        FROM
+        PROJECT
+        INNER JOIN TEAM ON (PROJECT.PRO_ID = TEAM.PRO_ID) INNER JOIN EMP ON (TEAM.EMP_ID = EMP.EMP_ID) INNER JOIN COMMON ON (PROJECT.PRO_ST_ID = COMMON.CM_ID)
+        WHERE
+        TEAM.EMP_ID = #{empId}
+        <include refid="searchFrag" />
+        )
+        SELECT COUNT(*) FROM PROJ
+</select>
+
+	<update id="updateEmp" parameterType="EmpVO">
+		UPDATE EMP
+		SET
+			 EMP.EMP_PASS = #{empPass,jdbcType=VARCHAR}
+			, EMP.EMP_RRNO = #{empRrno,jdbcType=VARCHAR}
+			, EMP.EMP_PHONE = #{empPhone,jdbcType=VARCHAR}
+			, EMP.EMP_ZIP = #{empZip,jdbcType=CHAR}
+			, EMP.EMP_ADDR = #{empAddr,jdbcType=VARCHAR}
+			, EMP.EMP_ADDR2 = #{empAddr2,jdbcType=VARCHAR}
+			, EMP.EMP_MAIL = #{empMail,jdbcType=VARCHAR}
+			, EMP.EMP_CMP_YMD = #{empCmpYmd,jdbcType=TIMESTAMP}
+			, EMP.EMP_CAREER = #{empCareer,jdbcType=NUMERIC}
+			<if test="empImg neq null and empImg.length gt 0">
+			, EMP.EMP_IMG = #{empImg,jdbcType=VARCHAR}
+			</if>
+		WHERE EMP_ID = #{empId}
+	</update>
+</mapper>

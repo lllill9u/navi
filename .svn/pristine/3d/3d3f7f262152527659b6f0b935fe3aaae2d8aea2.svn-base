@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.navi.project.dao.TeamDAO">
+<resultMap type="TeamVO" id="teamMap" autoMapping="true">
+<id column="PRO_ID" property="proId"/>
+<id column="EMP_ID" property="empId"/>
+<collection property="roleId" autoMapping="true">
+<id column="ROLE_ID" property="roleId" />
+</collection>
+</resultMap>
+ <select id="selectTeam" resultMap="teamMap">
+ SELECT
+    pro_id
+  , emp_id
+  , role_id
+  , team_yn
+FROM
+    team
+ </select>
+</mapper>

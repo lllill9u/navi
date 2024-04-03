@@ -1,0 +1,30 @@
+package kr.or.navi.board.form.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/board/form")
+public class FormController {
+
+	@GetMapping
+	public String formPage() {
+		return "form/formList";
+	}
+
+	@GetMapping("register")
+	public String formRegisterPage() {
+		return "form/form_register";
+	}
+
+	@GetMapping("detail")
+	public String formDetailPage() {
+		return "form/form_detail";
+	}
+
+	@GetMapping("modify")
+	public String formModifyPage() {
+		return "form/form_mod";
+	}
+}

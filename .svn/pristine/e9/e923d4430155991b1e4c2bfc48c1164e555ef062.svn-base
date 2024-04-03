@@ -1,0 +1,15 @@
+package kr.or.navi.quick.trip.vo;
+
+import java.io.Serializable;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(of="vacId")
+public class VacVO implements Serializable {
+	private String vacId;
+	private String vacName;
+	private String vacImg;
+	private String vacEx;
+}

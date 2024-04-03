@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.navi.mybatis.mappers.PhotoMapper">
+	<sql id="searchFrag">
+	<trim prefix="AND (" suffix=")" prefixOverrides="OR">
+            <foreach collection="typeArr" item="type">
+                <trim prefix="OR">
+                    <choose>
+                        <when test="type == 'T'.toString()">
+                            title like '%'||#{keyword}||'%' 
+                        </when>
+                        <when test="type == 'C'.toString()">
+                            content like '%'||#{keyword}||'%' 
+                        </when>
+                        <when test="type == 'W'.toString()">
+                            writer like '%'||#{keyword}||'%' 
+                        </when>
+                    </choose>
+                </trim>
+            </foreach>
+        </trim>
+    
+	</sql>
+	
+	<select id="selectTotalRecord" parameterType="PaginationInfo" resultType="int">
+		SELECT COUNT(*)
+		FROM BOARD_POST
+		<include refid="searchFrag" />
+	</select>
+	
+	<select id="selectPhotoList" parameterType="PaginationInfo" resultType="BoardPostVO">
+		SELECT B.*
+		FROM (
+			SELECT A.*, ROWNUM RNUM
+			FROM (
+				SELECT 
+					BP_ID, EMP_ID, BP_MOD_ID, BRD_ID
+					, BP_TITLE, BP_CN, BP_REG_DT
+					, BP_DEL_DT, BP_OP_YN, BP_MOD_DT
+					, BP_SHR_YN, BP_NTC_ID, BP_QNA_AS
+				FROM BOARD_POST
+				<include refid="searchFrag" />
+				START WITH BO_PARENT IS NULL
+                CONNECT BY PRIOR BO_NO = BO_PARENT
+				ORDER SIBLINGS BY BO_NO DESC
+			) A
+		)B
+		WHERE RNUM BETWEEN #{startRow} AND #{endRow}
+	</select>
+</mapper>

@@ -1,0 +1,56 @@
+package kr.or.navi.quick.food.controller;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.or.navi.quick.food.service.FoodService;
+import kr.or.navi.quick.food.vo.FoodVO;
+import kr.or.navi.security.RealUser;
+import kr.or.navi.vo.EmpVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@RequestMapping("/quick/food")
+@Controller
+public class FoodRecomController {
+	
+	@Inject
+	FoodService service;
+	
+	@GetMapping("")
+	public String foodPage(@RealUser EmpVO vo ,Model model) {
+		
+		List<FoodVO> foodList = service.selectFoodsList();
+		model.addAttribute("foodList",foodList);
+		
+//		List<FoodVO> recomList = service.recomFoodList(vo);
+//		model.addAttribute("recomList",recomList);
+		
+		return "quick/foodList";
+	}
+	
+	//food 상세조회
+	@GetMapping("{foodId}")
+	public String foodDatail(@PathVariable String foodId,Model model) {
+		
+		FoodVO foodInfo = service.selectOne(foodId);
+
+		model.addAttribute("foodId",foodId);
+		model.addAttribute("foodInfo",foodInfo);
+		
+		log.info("foodId:{}",foodId);
+		log.info("foodInfo:{}",foodInfo);
+		
+		return "quick/foodDetail";//뷰 jsp로 반환
+	}
+	
+	
+	
+}

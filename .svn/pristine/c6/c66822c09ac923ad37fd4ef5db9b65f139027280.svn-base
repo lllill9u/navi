@@ -1,0 +1,36 @@
+package kr.or.navi.quick.imageai;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.HashMap;
+
+import org.junit.jupiter.api.Test;
+
+import kr.or.navi.AbstractRootContextTest;
+import kr.or.navi.util.HttpUtil;
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
+class ImageAiControllerTest extends AbstractRootContextTest{
+	
+
+	String apiKey = "4435add9fef7c0694f63c5dcaf2d3582";
+	
+	@Test
+	void test() {
+		HashMap<String, Object> build = new HttpUtil()
+				.header("Authorization", "KakaoAK " + apiKey)
+				.header("Content-Type", "application/json")
+				
+				.body("version", "v2.1")
+				.body("prompt", "A little cat on the blue sky")
+				.body("height", 1024)
+				.body("width",1024)
+				
+				.url(url)
+				.method("POST")
+				.build();
+		log.info("build:{}",build);
+		
+	}
+
+}

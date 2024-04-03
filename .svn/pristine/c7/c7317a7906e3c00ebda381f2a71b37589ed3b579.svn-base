@@ -1,0 +1,27 @@
+package kr.or.navi.vo;
+
+import java.time.LocalDateTime;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(of="taskId")
+public class TaskVO {
+	private String taskId;
+	private String tsId;
+	private String proId;
+	private String taskManId;
+	private String taskTopId;
+	private String tpsId;
+	private String taskRegId;
+	private String taskTitle;
+	private LocalDateTime taskRegDt;
+	private LocalDateTime taskDdlineDt;
+	private LocalDateTime taskModDt;
+	private String taskCn;
+	private Integer taskRqrd;
+	private Integer taskEstTime;
+	private LocalDateTime taskCompDt;
+	private LocalDateTime taskDelDt;
+}
