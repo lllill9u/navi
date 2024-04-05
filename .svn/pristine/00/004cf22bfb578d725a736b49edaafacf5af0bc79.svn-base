@@ -1,9 +1,0 @@
-package kr.or.navi.quick.trip.service;
-
-import java.util.List;
-
-import kr.or.navi.quick.trip.vo.VacVO;
-
-public interface VacService {
-	public List<VacVO> selectVacList();
-}

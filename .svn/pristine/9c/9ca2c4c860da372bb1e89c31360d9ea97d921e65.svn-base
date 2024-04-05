@@ -1,8 +1,0 @@
-package kr.or.navi.mypage.service;
-
-import kr.or.navi.enumpkg.ServiceResult;
-import kr.or.navi.vo.EmpVO;
-
-public interface MypageService {
-	public ServiceResult modifyEmp(EmpVO vo);
-}

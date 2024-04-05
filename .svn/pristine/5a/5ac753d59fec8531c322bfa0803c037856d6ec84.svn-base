@@ -1,9 +1,0 @@
-package kr.or.navi.quick.news.service;
-
-import java.util.List;
-
-import kr.or.navi.quick.news.vo.NewsVO;
-
-public interface NewsService {
-	public List<NewsVO> selectNewsList();
-}
